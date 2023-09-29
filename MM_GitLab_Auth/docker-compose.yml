@@ -1,0 +1,56 @@
+version: '3'
+services:
+  webserver:
+    image: nginx:1.21.5
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./oauth:/var/www/html/oauth
+      - ./oauth.conf:/etc/nginx/conf.d/oauth.conf:ro
+      - ./certs:/etc/nginx/ssl:ro
+    depends_on:
+      - php
+  php:
+    build: ./Docker/php-ldap-pgsql
+    image: php-ldap-pgsql
+    volumes:
+      - ./oauth:/var/www/html/oauth
+    environment:
+      ldap_host: #'ldap://active_directory_server/'
+      ldap_base_dn: #'OU=* path'
+      ldap_search_attribute: 'SamAccountName'
+      ldap_filter: '(objectCategory=person)'
+      ldap_bind_dn: #'ldap_user'
+      ldap_bind_pass: #'ldap_user_password'
+      db_host: 'database'
+      db_port: '5432'
+      db_type: 'pgsql'
+      db_name: 'oauth_db'
+      db_user: 'oauth'
+      db_pass: 'oauth_secure-pass'
+    depends_on:
+      - database
+  database:
+    image: postgres:12.9
+    restart: always
+    volumes:
+      - ./db_init/init_postgres.sh:/docker-entrypoint-initdb.d/init_postgres.sh
+      - ./db_init/config_init.sh:/docker-entrypoint-initdb.d/config_init.sh
+      - ./data/:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rootroot
+      POSTGRES_HOST_AUTH_METHOD: trust
+      client_id: #openssl rand -hex 32
+      client_secret: #openssl rand -hex 32
+      redirect_uri: #'https://server_MatterMost/signup/gitlab/complete'
+      grant_types: 'authorization_code'
+      scope: 'api'
+      user_id: ''
+      db_user: 'oauth'
+      db_pass: 'oauth_secure-pass'
+      db_name: 'oauth_db'
+      db_host: '127.0.0.1'
+      db_port: '5432'

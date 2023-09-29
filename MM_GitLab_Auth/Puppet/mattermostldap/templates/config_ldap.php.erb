@@ -1,0 +1,17 @@
+<?php
+// LDAP server
+$ldap_host = "<%= @ldap_uri %>";
+$ldap_port = <%= @ldap_port %>;
+
+// Attribute use to identify user on LDAP (used in connexion.php, replace $rdn_suffix) - ex : uid, mail, sAMAccountName	
+$ldap_search_attribute = "<%= @ldap_attribute %>";
+
+// Base directory name of the LDAP 
+$ldap_base_dn = "<%= @ldap_base %>";
+
+// An optional filter to search in LDAP - ex : objectClass=person
+$ldap_filter = "<%= @ldap_filter %>";
+
+// ldap service user to allow search in ldap
+$ldap_bind_dn = "<%= @ldap_bind_dn %>";
+$ldap_bind_pass = "<%= @ldap_bind_pass %>";

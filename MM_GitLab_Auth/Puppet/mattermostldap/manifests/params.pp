@@ -1,0 +1,24 @@
+class mattermostldap::params {
+  $project_url  = 'http://localhost'
+  $base_url   = 'http://localhost:8065'
+  $install_path = '/var/www/html'
+  $ldap_base    = 'o=Company'
+  $ldap_filter  = ''
+  $ldap_uri   = 'ldap://hostname.com'
+  $ldap_port    = 389
+  $ldap_attribute   = 'uid'
+  $db_user    = 'oauth'
+  $db_pass    = 'oauth_secure-pass'
+  $db_host    = 'localhost'
+  $db_port    = 5432
+  $db_type    = 'pgsql'
+  $db_name    = 'oauth_db'
+  $client_id    = undef
+  $client_secret  = undef
+  $grant_types  = 'authorization_code'
+  $scope      = 'api'
+  $user_id    = ''
+  $timezone   = 'Europe/Paris'
+  $ldap_bind_dn  = ''
+  $ldap_bind_pass = ''
+}

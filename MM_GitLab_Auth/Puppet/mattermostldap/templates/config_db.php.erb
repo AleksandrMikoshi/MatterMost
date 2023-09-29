@@ -1,0 +1,14 @@
+<?php
+
+//Database Server
+$db_port  	  = "<%= @db_port %>";
+$db_host  	  = "<%= @db_host %>";
+$db_name  	  = "<%= @db_name %>";
+$db_type	  = "<%= @db_type %>";
+$db_user 	  = "<%= @db_user %>";
+$db_pass	  = "<%= @db_pass %>";
+$dsn	  	  = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port; 
+
+//Set date.timezone to avoid E.Notice raise by strtotime() (in Pdo.php)
+//If date.timezone is not defined, Mattermost will return a bad token request error
+date_default_timezone_set ('<%= @timezone %>');

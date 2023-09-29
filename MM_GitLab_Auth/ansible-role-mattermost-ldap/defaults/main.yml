@@ -1,0 +1,15 @@
+---
+mattermost_ldap__ldap_host: 'ldap://domain.local'
+mattermost_ldap__ldap_port: 389
+mattermost_ldap__ldap_base_dn: 'DC=domain,DC=local'
+mattermost_ldap__ldap_search_attribute: 'uid'
+mattermost_ldap__ldap_filter: '(objectCategory=*)'
+mattermost_ldap__ldap_bind_dn: ''
+mattermost_ldap__ldap_bind_pass: ''
+
+mattermost_ldap__db_type: 'pgsql'
+mattermost_ldap__db_host: 'localhost'
+mattermost_ldap__db_port: '5432'
+mattermost_ldap__db_name: 'oauth_db'
+mattermost_ldap__db_user: 'oauth'
+mattermost_ldap__db_pass: 'oauth_secure-pass'
