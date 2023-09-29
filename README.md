@@ -1,5 +1,6 @@
 # MatterMost
+[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/Readme_ru.md)
 
-Улучшения функционала бесплатной версии сервиса MatterMost.
-**MM_Gitlab_Auth** — разрешает авторизацию в MatterMost через Active Directory.
-**MatterMost_TAG** — позволяет централизованно и автоматизированно добавлять теги сотрудникам в зависимости от членства в группах Active Directory.
+Improvements to the functionality of the free version of the MatterMost service.   
+**MM_Gitlab_Auth** - allows authorization in MatterMost via Active Directory.   
+**MatterMost_TAG** - allows you to centrally and automatically add tags to employees depending on membership in Active Directory groups.

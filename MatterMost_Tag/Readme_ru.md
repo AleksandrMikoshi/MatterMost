@@ -14,6 +14,7 @@
 
 Пример:
 ## Добавление тегов всем членам группы "Domain Users"
+```
 $Group_All = Get-ADGroupMember -Identity "Domain Users" | Where-Object -FilterScript {$_.distinguishedName -match $OU_Users} | ForEach-Object -Process {Get-ADUser -Identity $_ -properties mail}
 $Tag_All = @('@tag1','@tag2','@tag3')
 foreach ($user_All in $Group_All){
@@ -32,8 +33,9 @@ foreach ($user_All in $Group_All){
         "$($user_All.samaccountname) has not mail" | Out-File -FilePath $Log -Append
     }
 }
-
+```
 ## Добавление тегов всем членам группы "New_Group"
+```
 $Group_New = Get-ADGroupMember -Identity "New_Group" | Where-Object -FilterScript {$_.distinguishedName -match $OU_Users} | ForEach-Object -Process {Get-ADUser -Identity $_ -properties mail}
 $Tag_New = @('@tag4','@tag5')
 foreach ($user_New in $Group_New){
@@ -52,3 +54,4 @@ foreach ($user_New in $Group_New){
         "$($user_New.samaccountname) has not mail" | Out-File -FilePath $Log -Append
     }
 }
+```

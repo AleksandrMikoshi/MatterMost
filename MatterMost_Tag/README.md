@@ -1,8 +1,10 @@
-#MatterMost_Tag
+# MatterMost_Tag
 
-Tagging is added based on Active Directory group membership.
+[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/MatterMost_Tag/Readme_ru.md)
 
-First, user email addresses are collected, then tags are added.
+Tagging is added based on Active Directory group membership.   
+
+First, user email addresses are collected, then tags are added.   
 On the server where this functionality will work, you must install:
 - Python3
 - pip
@@ -14,6 +16,7 @@ In order to use group separation, you need to add your variables to the script a
 
 Example:
 ## Adding tags to all members of the "Domain Users" group
+```
 $Group_All = Get-ADGroupMember -Identity "Domain Users" | Where-Object -FilterScript {$_.distinguishedName -match $OU_Users} | ForEach-Object -Process {Get-ADUser -Identity $_ -properties mail}
 $Tag_All = @('@tag1','@tag2','@tag3')
 foreach ($user_All in $Group_All){
@@ -32,8 +35,9 @@ foreach ($user_All in $Group_All){
          "$($user_All.samaccountname) has not mail" | Out-File -FilePath $Log -Append
      }
 }
-
+```
 ## Adding tags to all members of the "New_Group" group
+```
 $Group_New = Get-ADGroupMember -Identity "New_Group" | Where-Object -FilterScript {$_.distinguishedName -match $OU_Users} | ForEach-Object -Process {Get-ADUser -Identity $_ -properties mail}
 $Tag_New = @('@tag4','@tag5')
 foreach ($user_New in $Group_New){
@@ -52,3 +56,4 @@ foreach ($user_New in $Group_New){
          "$($user_New.samaccountname) has not mail" | Out-File -FilePath $Log -Append
      }
 }
+```
