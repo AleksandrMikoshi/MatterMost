@@ -1,0 +1,20 @@
+- name: "Install Mattermost"
+  block: 
+    - ansible.builtin.import_tasks: mm/tasks/get_date.yml
+    - ansible.builtin.import_tasks: mm/tasks/update_service.yml
+  tags:
+    - update_service
+
+- name: "Changing the configuration file"
+  block: 
+    - ansible.builtin.import_tasks: mm/tasks/get_date.yml
+    - ansible.builtin.import_tasks: mm/tasks/update_config.yml
+  tags:
+    - update_conf
+
+- name: "Replacing a certificate"
+  block: 
+    - ansible.builtin.import_tasks: mm/tasks/get_date.yml
+    - ansible.builtin.import_tasks: mm/tasks/update_cert.yml
+  tags:
+    - update_cert

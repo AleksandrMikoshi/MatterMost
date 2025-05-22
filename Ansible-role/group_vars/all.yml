@@ -1,0 +1,7 @@
+mattermost_version: --mattermost_version-- # example 10.7.0
+mattermost_user: --mattermost_user-- # example mattermost
+
+vault_url: --vault_url-- # example https://vault.domain.com:8200
+path_cert: --path_cert-- # example certificates/data/keys
+
+alloweduntrustedinternalconnections: # example site.com, site_2.com, site_3.com, etc.

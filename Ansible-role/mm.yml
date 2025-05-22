@@ -1,0 +1,4 @@
+- name: Mattermost
+  hosts: all
+  roles:
+    - mm

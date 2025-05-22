@@ -1,0 +1,19 @@
+- name: Update config MatterMost
+  block:
+  
+    # Replacing the config file with the required data
+    - name: 'Apply mattermost config.json template'
+      template:
+        src: ../templates/config.json.j2
+        dest: /opt/mattermost/current/config/config.json
+        owner: "{{ mattermost_user }}"
+        group: "{{ mattermost_user }}"
+        mode: 0644
+      become: yes
+
+    # Reread the configuration file
+    - name: 'Mattermost configuration reload'
+      ansible.builtin.shell: |
+        ./mmctl config reload
+      args:
+        chdir: /opt/mattermost/current/bin

@@ -1,0 +1,110 @@
+- name: Update service MatterMost
+  block:
+  
+    # Download archive .tar.gz from the official site
+    - name: 'Download archive from https://releases.mattermost.com'
+      get_url: 
+        url: 'https://releases.mattermost.com/{{ mattermost_version }}/mattermost-team-{{ mattermost_version }}-linux-amd64.tar.gz'
+        dest: /tmp/
+      become: yes
+
+    # Creating a directory with a new version
+    - name: 'Create target directory'
+      ansible.builtin.file:
+        path: "/opt/mattermost/{{ mattermost_version }}"
+        state: directory
+        owner: mattermost
+        group: mattermost
+        mode: '0755'
+      become: yes
+
+    # Recursively copying a directory with plugins for saving
+    - name: 'Copy directory recursively'
+      ansible.builtin.copy:
+        src: /opt/mattermost/plugins
+        dest: /opt/mattermost/plugins_buck
+        owner: mattermost
+        group: mattermost
+        mode: '0755'
+        force: yes
+        directory_mode: yes
+        remote_src: yes 
+      become: yes
+
+    # Unpacking the archive into a directory
+    - name: 'Extract archive directly to target'
+      ansible.builtin.unarchive:
+        src: "/tmp/mattermost-team-{{ mattermost_version }}-linux-amd64.tar.gz"
+        dest: "/opt/mattermost/{{ mattermost_version }}"
+        remote_src: yes
+        extra_opts: ["--strip-components=1"]
+        owner: mattermost
+        group: mattermost
+      become: yes
+
+    # Replacing the config file with the required data
+    - name: 'Apply mattermost config.json template'
+      template:
+        src: ../templates/config.json.j2
+        dest: /opt/mattermost/{{ mattermost_version }}/config/config.json
+        owner: "{{ mattermost_user }}"
+        group: "{{ mattermost_user }}"
+        mode: 0644
+      become: yes
+
+    # Assigning rights to a directory
+    - name: 'Change mattermost directory permissions'
+      file:
+        path: /opt/mattermost/{{ mattermost_version }}
+        state: directory
+        owner: "{{ mattermost_user }}"
+        group: "{{ mattermost_user }}"
+        recurse: yes
+      become: yes
+
+    # Re-creating a symlink 
+    - name: 'Create symbolic link for directory'
+      ansible.builtin.file:
+        src: /opt/mattermost/{{ mattermost_version }}
+        dest: /opt/mattermost/current
+        state: link
+        force: yes
+      become: yes
+
+    # Granting non-root user permissions to listen on port 443
+    - name: 'Ensure capabilities are set for Mattermost binary'
+      ansible.builtin.command: >
+        setcap 'cap_net_bind_service=+ep' /opt/mattermost/{{ mattermost_version }}/bin/mattermost
+      become: yes
+
+    # Creating a log directory and granting rights
+    - name: 'Ensure Mattermost log directory exists'
+      ansible.builtin.file:
+        path: /var/log/mattermost
+        state: directory
+        owner: "{{ vault_data.data.data.data.mattermost_user }}"
+        group: "{{ vault_data.data.data.data.mattermost_user }}"
+        mode: '0755'
+        recurse: yes
+      become: yes
+
+    # Creating a service
+    - name: 'Create Mattermost unit for SystemD'
+      template:
+        src: mattermost.service.j2
+        dest: /etc/systemd/system/mattermost.service
+        owner: '{{ vault_data.data.data.data.mattermost_user }}'
+        group: '{{ vault_data.data.data.data.mattermost_user }}'
+        mode: 0644
+      notify: Restart Mattermost
+
+    # Comparison of the new and old plugin catalog
+    - name: Compare directories properly
+      ansible.builtin.shell: |
+        find /opt/mattermost/plugins -type f -exec ls -la {} \; | sort > /tmp/dir1.list
+        find /opt/mattermost/plugins_buck -type f -exec ls -la {} \; | sort > /tmp/dir2.list
+        diff -u /tmp/dir1.list /tmp/dir2.list > /tmp/dir_diff.txt || true
+      args:
+        executable: /bin/bash
+      register: dir_diff
+      changed_when: dir_diff.rc == 1

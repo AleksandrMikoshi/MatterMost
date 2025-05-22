@@ -1,0 +1,6 @@
+- name: 'Restart Mattermost'
+  systemd:
+    name: mattermost
+    daemon_reload: true
+    state: restarted
+    enabled: true

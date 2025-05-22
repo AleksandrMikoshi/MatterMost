@@ -1,0 +1,3 @@
+# Токен для подключения к Vault
+mattermost: # example it/data/mattermost
+mattermost_conf: # example it/data/mattermost-config

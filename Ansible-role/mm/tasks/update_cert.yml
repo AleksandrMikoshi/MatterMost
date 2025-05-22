@@ -1,0 +1,59 @@
+- name: Update_cert
+  block:
+
+    - name: "Install pip3 (Python package manager)"
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
+      become: yes
+
+
+    - name: "Install hvac (Python library for Vault)"
+      ansible.builtin.pip:
+        name: hvac
+        executable: pip3
+      become: yes
+
+    # Getting a Certificate from Vault
+    - name: "Read secret from Vault"
+      community.hashi_vault.vault_read:
+        url: "{{ vault_url }}"
+        token: "{{ lookup('env', 'VAULT_TOKEN') }}"
+        path: "{{ path_cert }}"
+      register: vault_cert
+
+    # Replacing the public part of the certificate on the server
+    - name: "Save open certificate"
+      ansible.builtin.copy:
+        content: "{{ vault_cert.data.data.data.crt }}"
+        dest: "{{ mattermost_config.data.data.data.CERTIFICATE_CRT }}"
+        mode: "0644"
+      become: yes
+
+    # Replacing the private part of the certificate on the server
+    - name: "Save private certificate"
+      ansible.builtin.copy:
+        content: "{{ vault_cert.data.data.data.key }}"
+        dest: "{{ mattermost_config.data.data.data.CERTIFICATE_KEY }}"
+        mode: "0600"
+      become: yes
+
+    # Assigning rights to a directory
+    - name: 'Change mattermost directory permissions'
+      file:
+        path: /opt/mattermost/ssl
+        state: directory
+        owner: "{{ mattermost_user }}"
+        group: "{{ mattermost_user }}"
+        recurse: yes
+      become: yes
+
+    # Creating a service
+    - name: 'Create Mattermost unit for SystemD'
+      template:
+        src: mattermost.service.j2
+        dest: /etc/systemd/system/mattermost.service
+        owner: '{{ mattermost_user }}'
+        group: '{{ mattermost_user }}'
+        mode: 0644
+      notify: Restart Mattermost

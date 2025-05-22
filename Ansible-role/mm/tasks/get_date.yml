@@ -1,0 +1,32 @@
+- name: get_date
+  tags:
+    - get_date
+  block:
+
+    - name: "Install pip3 (Python package manager)"
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
+      become: yes
+
+
+    - name: "Install hvac (Python library for Vault)"
+      ansible.builtin.pip:
+        name: hvac
+        executable: pip3
+      become: yes
+
+    # Getting data for config from Vault
+    - name: "Read data from Vault"
+      community.hashi_vault.vault_read:
+        url: "{{ vault_url }}"
+        token: "{{ lookup('env', 'VAULT_TOKEN') }}"
+        path: "{{ mattermost }}"
+      register: mattermost_data
+
+    - name: "Read data config from Vault"
+      community.hashi_vault.vault_read:
+        url: "{{ vault_url }}"
+        token: "{{ lookup('env', 'VAULT_TOKEN') }}"
+        path: "{{ mattermost_conf }}"
+      register: mattermost_config
