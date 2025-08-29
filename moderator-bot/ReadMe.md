@@ -1,6 +1,6 @@
 # 🛡️ Mattermost Moderator Bot
 
-[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/moderator_bot/Readme_ru.md)
+[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/moderator-bot/ReadMe_ru.md)
 
 A moderation bot for Mattermost that restricts the ability to post new messages in channels.  
 Users outside the allowlist:
