@@ -1,5 +1,5 @@
 # Mattermost Ansible Role
-[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/Ansible_mattermost/Readme_ru.md)  
+[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/Ansible-role/Readme_ru.md)  
 Ansible role for automating **Mattermost** updates.  
 Supports the following operations:  
 1. Update the Mattermost service  

@@ -12,6 +12,8 @@ The goal of this repository is to make Mattermost more convenient for corporate 
 
 ---
 ## 📂 Repository Structure
+- [**Ansible-role**](https://github.com/AleksandrMikoshi/MatterMost/tree/main/Ansible-role) 
+  Role for Mattermost service update and configuration management
 - [**MM_Gitlab_Auth**](https://github.com/AleksandrMikoshi/MatterMost/tree/main/MM_Gitlab_Auth)  
   Extension that enables **Active Directory authentication** in Mattermost.  
 - [**MatterMost_Tag**](https://github.com/AleksandrMikoshi/MatterMost/tree/main/MatterMost_Tag)  

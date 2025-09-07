@@ -11,6 +11,8 @@
 
 ---
 ## 📂 Структура репозитория
+- [**Ansible-role**](https://github.com/AleksandrMikoshi/MatterMost/tree/main/Ansible-role)
+  Роль для обновления сервиса Mattermost и управления конфигурацией
 - [**MM_Gitlab_Auth**](https://github.com/AleksandrMikoshi/MatterMost/tree/main/MM_Gitlab_Auth)  
   Расширение, позволяющее авторизовываться в Mattermost через **Active Directory**.  
 - [**MatterMost_TAG**](https://github.com/AleksandrMikoshi/MatterMost/tree/main/MatterMost_Tag)  

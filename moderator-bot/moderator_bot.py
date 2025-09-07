@@ -48,7 +48,7 @@ class ModeratorBot:
             "scheme": cfg.scheme,
             "port": cfg.port,
             "token": cfg.token,
-            "verify": False,  # игнорируем самоподписанный SSL
+            "verify": False,
             "timeout": 30,
         })
         self.team_id = None
@@ -61,7 +61,7 @@ class ModeratorBot:
         self.thread_allow: Set[str] = set()
         self.me_id = None
         self.last_post_time: Dict[str, str] = {}
-        self.start_time = str(int(time.time() * 1000))  # миллисекунды
+        self.start_time = str(int(time.time() * 1000))
 
     def log(self, *args):
         print("[moderator-bot]", *args, flush=True)
@@ -167,10 +167,8 @@ class ModeratorBot:
 
         allowed = self.allow_by_channel[channel_id]
 
-        # --- проверка на тред ---
         if user_id not in allowed:
             if post.get("root_id") and channel_id in self.thread_allow:
-                # это ответ в тред и канал разрешён для тредов
                 return
 
         if user_id in allowed:
