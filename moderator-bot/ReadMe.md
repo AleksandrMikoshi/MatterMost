@@ -4,6 +4,7 @@ A moderation bot for Mattermost that restricts the ability to post new messages 
 Users outside the allowlist:
 - ❌ Cannot post new messages in the channel
 - ✅ Can reply in threads — only in channels listed in THREAD_ALLOWLIST
+- 🗑️ System messages (e.g. *user joined channel*, *user added*) can be automatically deleted in channels listed in SYSTEM_MESSAGE_DELETE
 - 📩 Receive a Direct Message notification with the reason for blocking
 
 ---
@@ -17,6 +18,8 @@ For each channel:
     - if the channel is in THREAD_ALLOWLIST → the message remains
     - if the channel is not in THREAD_ALLOWLIST → the message is deleted
 - If DM_NOTIFY=yes is enabled, the bot sends the user a direct message with the text from DM_TEXT
+- if the channel is in SYSTEM_MESSAGE_DELETE, any system messages (`system_join_channel`, `system_add_to_channel`, etc.) are deleted automatically
+
 
 ---
 ## 🔧 Dependencies
@@ -26,9 +29,11 @@ For each channel:
 
 ---
 ## ⚠️ Notes
-If Mattermost uses a self-signed certificate, the bot runs with verify=False (you will see InsecureRequestWarning messages in the logs, but they are not critical)    
-The bot must be added to the channels it moderates  
-All configuration is done through .env
+- If Mattermost uses a self-signed certificate, the bot runs with `verify=False` (by default).  
+  In this case, `InsecureRequestWarning` may appear in logs. They are not critical and can be suppressed by the bot.  
+- To improve security, you can mount a trusted CA certificate inside the container and set `verify=/path/to/ca.crt` instead of disabling SSL verification.  
+- The bot must be added to the channels it moderates.  
+- All configuration is done through `.env`.
 
 ---
 ## ⚙️ Environment Setup
@@ -43,6 +48,7 @@ TEAM_NAME=your-team
 CHANNEL_ALLOWLIST=test:@admin1,@admin2;general:@moderator
 GLOBAL_ALLOWLIST=@superadmin
 THREAD_ALLOWLIST=test,dev-chat
+SYSTEM_MESSAGE_DELETE=test,general
 
 DM_NOTIFY=yes
 DM_TEXT=Only allowed users can post in this channel. Channel: {channel}
@@ -57,6 +63,8 @@ CHANNEL_ALLOWLIST=test:@admin1,@admin2;general:@moderator
 GLOBAL_ALLOWLIST=@superadmin  
 **Channels where users can reply in threads**  
 THREAD_ALLOWLIST=test,dev-chat  
+**Channels where system messages will be deleted**
+SYSTEM_MESSAGE_DELETE=test,general
 **Direct Message notifications**  
 DM_NOTIFY=yes  
 DM_TEXT=Only allowed users can post in this channel. Channel: {channel}  

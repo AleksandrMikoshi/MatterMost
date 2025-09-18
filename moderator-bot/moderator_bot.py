@@ -8,6 +8,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import warnings
+import urllib3
+
+# отключаем предупреждения от urllib3 о verify=False
+warnings.simplefilter("ignore", urllib3.exceptions.InsecureRequestWarning)
 
 @dataclass
 class Config:
@@ -19,6 +24,7 @@ class Config:
     channel_allowlist_raw: str
     global_allowlist_raw: str
     thread_allowlist_raw: str
+    system_delete_raw: str
     dm_notify: bool
     dm_text: str
     poll_interval: int
@@ -34,6 +40,7 @@ def load_config() -> Config:
         channel_allowlist_raw=os.getenv("CHANNEL_ALLOWLIST", "").strip(),
         global_allowlist_raw=os.getenv("GLOBAL_ALLOWLIST", "").strip(),
         thread_allowlist_raw=os.getenv("THREAD_ALLOWLIST", "").strip(),
+        system_delete_raw=os.getenv("SYSTEM_MESSAGE_DELETE", "").strip(),
         dm_notify=(os.getenv("DM_NOTIFY", "no").lower() in ("yes", "true", "1")),
         dm_text=os.getenv("DM_TEXT", "Posting is restricted in {channel}. Contact admins."),
         poll_interval=int(os.getenv("POLL_INTERVAL", "5")),
@@ -48,7 +55,7 @@ class ModeratorBot:
             "scheme": cfg.scheme,
             "port": cfg.port,
             "token": cfg.token,
-            "verify": False,
+            "verify": False,  # игнорируем самоподписанный SSL
             "timeout": 30,
         })
         self.team_id = None
@@ -59,9 +66,10 @@ class ModeratorBot:
         self.allow_by_channel: Dict[str, Set[str]] = {}
         self.global_allow: Set[str] = set()
         self.thread_allow: Set[str] = set()
+        self.system_delete_channels: Set[str] = set()
         self.me_id = None
         self.last_post_time: Dict[str, str] = {}
-        self.start_time = str(int(time.time() * 1000))
+        self.start_time = str(int(time.time() * 1000))  # миллисекунды
 
     def log(self, *args):
         print("[moderator-bot]", *args, flush=True)
@@ -80,6 +88,7 @@ class ModeratorBot:
 
         self._load_channels()
         self._build_allowlists()
+        self._build_system_delete()
         self._poll_loop()
 
     def _load_channels(self):
@@ -126,6 +135,15 @@ class ModeratorBot:
                     self.thread_allow.add(ch_id)
             self.log(f"Thread-allowlist: {len(self.thread_allow)} channels")
 
+    def _build_system_delete(self):
+        if self.cfg.system_delete_raw:
+            for ch_name in self.cfg.system_delete_raw.split(","):
+                ch_name = ch_name.strip()
+                ch_id = self.channel_name_to_id.get(ch_name)
+                if ch_id:
+                    self.system_delete_channels.add(ch_id)
+            self.log(f"System-message-delete list: {len(self.system_delete_channels)} channels")
+
     @staticmethod
     def _split_users(users_str: str):
         return [u.strip().lstrip("@") for u in users_str.split(",") if u.strip()]
@@ -159,14 +177,28 @@ class ModeratorBot:
         user_id = post.get("user_id")
         channel_id = post.get("channel_id")
         post_id = post.get("id")
+        post_type = post.get("type", "")
 
         if user_id == self.me_id:
             return
+
+        # --- удаление системных сообщений независимо от allowlist ---
+        if channel_id in self.system_delete_channels and post_type and post_type.startswith("system_"):
+            ch_name = self.channel_id_to_name.get(channel_id, channel_id)
+            try:
+                self.driver.posts.delete_post(post_id)
+                self.log(f"Deleted system post {post_id} ({post_type}) in #{ch_name}")
+            except Exception as e:
+                self.log(f"Failed to delete system post {post_id}: {e}")
+            return
+
+        # --- обычная логика модерации ---
         if channel_id not in self.allow_by_channel:
             return
 
         allowed = self.allow_by_channel[channel_id]
 
+        # проверка на тред
         if user_id not in allowed:
             if post.get("root_id") and channel_id in self.thread_allow:
                 return
@@ -192,7 +224,7 @@ class ModeratorBot:
     def _poll_loop(self):
         self.log(f"Starting polling every {self.cfg.poll_interval} seconds…")
         while True:
-            for ch_id in self.allow_by_channel.keys():
+            for ch_id in set(list(self.allow_by_channel.keys()) + list(self.system_delete_channels)):
                 try:
                     posts_data = self.driver.posts.get_posts_for_channel(
                         ch_id,
