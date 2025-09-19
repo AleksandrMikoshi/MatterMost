@@ -1,5 +1,5 @@
 # 🛡️ Mattermost Moderator Bot
-[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/moderator-bot/ReadMe_ru.md)
+[Русский язык](https://github.com/AleksandrMikoshi/MatterMost/blob/main/moderator-bot/ReadMe_ru.md)  
 A moderation bot for Mattermost that restricts the ability to post new messages in channels.  
 Users outside the allowlist:
 - ❌ Cannot post new messages in the channel
@@ -64,7 +64,7 @@ GLOBAL_ALLOWLIST=@superadmin
 **Channels where users can reply in threads**  
 THREAD_ALLOWLIST=test,dev-chat  
 **Channels where system messages will be deleted**
-SYSTEM_MESSAGE_DELETE=test,general
+SYSTEM_MESSAGE_DELETE=test,general  
 **Direct Message notifications**  
 DM_NOTIFY=yes  
 DM_TEXT=Only allowed users can post in this channel. Channel: {channel}  
